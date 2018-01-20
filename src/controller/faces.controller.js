@@ -11,39 +11,68 @@ const recognizer = fr.FaceRecognizer()
 const drawRects = (win, rects) => rects.forEach(rect => win.addOverlay(rect))
 const ronaldModel = require('../ronaldModel')
 
-class UsersController extends Controller {
-    static async getAndRecognizeFaces(req, res, next) {
+class FaceController extends Controller {
+    static async getAndProcessImages(req, res, next){
         const username = req.params.username
+        const returnInfo = await FaceController.getImages(username)
+        console.log('inbetween')
+        setTimeout(()=>FaceController.processImages(returnInfo),3000)
+        next({ status: 200, message: `Yay` })
+    }
+
+    static async fileCheck(info){
+        let counter = 0
+        while (!fs.existsSync(`./src/faceImages/${info.username}/image1.png`) || counter < 10000){ 
+            console.log('not ready yet')
+            counter++
+        }
+    }
+
+    static async getImages(username) {
         const chromeless = new Chromeless()
 
         const photoLinks = await chromeless
             .goto(`https://www.instagram.com/${username}/`)
-            .scrollTo(0, 3000) //need to figure out how to wait after scroll
-            // .click('._1cr2e')
-            // .wait('._2di5p:nth-of-type(13)')
+            .scrollTo(0, 3000)
+            .click('._1cr2e')
+            .wait(5000)
+            .scrollTo(0, 6000)
+            .wait(5000)
             .evaluate(() => {
             const links = [].map.call(document.querySelectorAll('._2di5p'), a => a.src)
             return links
-            })
+        })
 
-        const download = await function(uri, filename, callback){
+        const download = function(uri, filename, callback){
             request.head(uri, function(err, res, body){
-                request(uri).pipe(fs.createWriteStream(filename)).on('close', callback)
+                request(uri).pipe(fs.createWriteStream(filename)).on('finish', callback)
             })
         }
 
         if (!fs.existsSync(`./src/faceImages/${username}`)) fs.mkdirSync(`./src/faceImages/${username}`)
+        console.log('saving images')
 
         for (let i = 0; i < photoLinks.length; i++){
             download(photoLinks[i], `./src/faceImages/${username}/image${i+1}.png`, () => console.log(`${username}: image${i+1} saved`))
         }
 
-        await chromeless.end()
+        console.log('done downloading')
+        chromeless.end()
+        return { username, photoLinks }
+    }
+
+    static async processImages(info){
+        const username = info.username
+        const photoLinks = info.photoLinks
+
+        console.log('processing images')
+
         fr.winKillProcessOnExit()
 
         if (!fs.existsSync(`./src/faceImages/${username}/faces`)) fs.mkdirSync(`./src/faceImages/${username}/faces`)
 
         for (let p = 0; p < photoLinks.length; p++){
+            console.log(`processing image ${p+1}`)
             const image = fr.loadImage(`./src/faceImages/${username}/image${p+1}.png`)
 
             const startTime = Date.now()
@@ -59,12 +88,14 @@ class UsersController extends Controller {
             console.log(`image ${p+1} complete`)
             // win.addOverlay(faceRectangles)
         }
-        console.log(`face location and saving complete`)
+        console.log(`face location and saving complete, press enter to continue`)
+        fr.hitEnterToContinue()
 
-        // INSERT QUIZ HERE TO CHECK FACES
+
+        //INSERT QUIZ HERE TO CHECK FACES
 
         // const faceMap = fs.readdirSync(`./src/faceImages/${username}/faces/`).map(file => {
-        //     fr.loadImage(file)
+        //     fr.loadImage(file).catch(console.err)
         // })
 
         // console.log(`adding faces`)
@@ -79,8 +110,8 @@ class UsersController extends Controller {
         // console.log(`predicting completed in ${Math.round(((Date.now()-startTime)/100)/10)} seconds`)
         // console.log(predictions)
 
-        await next({ status: 200, message: `Yay` })
+        //await next({ status: 200, message: `Yay` })
     }
 }
 
-module.exports = UsersController
+module.exports = FaceController
