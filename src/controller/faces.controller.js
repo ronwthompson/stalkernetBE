@@ -45,19 +45,21 @@ class FaceController extends Controller {
 
         const download = function(uri, filename, callback){
             request.head(uri, function(err, res, body){
-                request(uri).pipe(fs.createWriteStream(filename)).on('finish', callback)
+                const e = fs.createWriteStream(filename)
+                request(uri).pipe(e)
+                e.on('finish', callback)
             })
         }
 
         if (!fs.existsSync(`./src/faceImages/${username}`)) fs.mkdirSync(`./src/faceImages/${username}`)
         console.log('saving images')
 
-        for (let i = 0; i < photoLinks.length; i++){
-            download(photoLinks[i], `./src/faceImages/${username}/image${i+1}.png`, () => console.log(`${username}: image${i+1} saved`))
-        }
+        const allPhotos = photoLinks.map((el, i) => download(el, `./src/faceImages/${username}/image${i+1}.png`, () => console.log(`${username}: image${i+1} saved`)))
 
         console.log('done downloading')
         chromeless.end()
+        console.log('waiting 5 seconds...')
+        await setTimeout(()=>{console.log('continuing')}, 5000)
         return { username, photoLinks }
     }
 
@@ -65,6 +67,9 @@ class FaceController extends Controller {
         const username = info.username
         const photoLinks = info.photoLinks
 
+        console.log('waiting 5 seconds...')
+        await setTimeout(()=>{console.log('continuing')}, 5000)
+        
         console.log('processing images')
 
         fr.winKillProcessOnExit()
