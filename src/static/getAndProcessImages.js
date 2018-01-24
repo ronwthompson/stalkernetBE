@@ -1,3 +1,4 @@
+const path = require('path')
 const fr = require('face-recognition')
 const { Chromeless } = require('chromeless')
 const fs = require('fs')
@@ -6,6 +7,9 @@ const Model = require(`../models/faces.model`)
 const detector = fr.FaceDetector()
 const recognizer = fr.FaceRecognizer()
 const drawRects = (win, rects) => rects.forEach(rect => win.addOverlay(rect))
+const sendemail = require('sendemail')
+const email = sendemail.email
+sendemail.set_template_directory(path.join(__dirname, '..', '..', 'templates'))
 
 const getImages = async (username) => {
     console.log('getting instagram pics')
@@ -17,6 +21,10 @@ const getImages = async (username) => {
         .click('._1cr2e')
         .wait(5000)
         .scrollTo(0, 6000)
+        .wait(5000)
+        .scrollTo(0, 9000)
+        .wait(5000)
+        .scrollTo(0, 12000)
         .wait(5000)
         .evaluate(() => {
         const links = [].map.call(document.querySelectorAll('._2di5p'), a => a.src)
@@ -51,6 +59,7 @@ const processImages = async (info) =>{
     const username = info.username
     const photoLinks = info.photoLinks
     const allPhotos = info.allPhotos
+    const faceLocationArray = []
     console.log('processing images')
 
     fr.winKillProcessOnExit()
@@ -69,12 +78,27 @@ const processImages = async (info) =>{
         console.log('setting image')
         for (let i = 0; i < faceImages.length; i++){
             fr.saveImage(`./src/faceImages/${username}/faces/face${p}_${i}.png`, faceImages[i])
+            faceLocationArray.push(`./src/faceImages/${username}/faces/face${p}_${i}.png`)
         }
         console.log(`image ${p+1} complete`)
     }
     console.log(`face location and saving complete`)
-    Model.storeFaces(allPhotos)
+    //Model.storeFaces(allPhotos)
     // send email to user with quiz url
+
+    const person = {
+      name : "Stalker",
+      email: "stalkernetdev@gmail.com",
+      subject:"Testing StalkerNET",
+      quizUrl: "http://totally.real.com",
+      imageArray: JSON.stringify(faceLocationArray)
+    }
+     
+    email('quiz', person, function(error, result){
+      console.log(' - - - - - - - - - - - - - - - - - - - - -> email sent: ')
+      console.log(result);
+      console.log(' - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
+    })
 }
 
 module.exports = {
