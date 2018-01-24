@@ -8,6 +8,7 @@ const recognizer = fr.FaceRecognizer()
 const drawRects = (win, rects) => rects.forEach(rect => win.addOverlay(rect))
 
 const getImages = async (username) => {
+    console.log('getting instagram pics')
     const chromeless = new Chromeless()
 
     const photoLinks = await chromeless

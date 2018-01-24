@@ -8,10 +8,10 @@ class AuthController extends Controller {
 
     static checkLogin(req, res, next) {
         let pass = req.body.password
-        let email = req.body.email
-        Model.oneFromEmail(email).then(userObj => {
+        let username = req.body.username
+        Model.oneFromUsername(username).then(userObj => {
             if (!userObj) {
-                return next({ status: 404, message: `User with email of ${email} not found.` })
+                return next({ status: 404, message: `User with username of ${username} not found.` })
             }
             req.userObj = userObj
             return encryption.promiseCompare(pass, userObj.password)
@@ -45,6 +45,7 @@ class AuthController extends Controller {
 
     static verifyToken(req, res, next) {
         let [bearer, token] = req.headers.auth ? req.headers.auth.split(' ') : [null, null]
+        console.log(req.headers)
         jwt.verify(token, process.env.TOKEN_SECRET, (err, vToken) => {
             if (err) {
                 console.log('ERROR: ', err.message)
@@ -57,13 +58,12 @@ class AuthController extends Controller {
     }
 
     static setUserType(req, res, next) {
-        console.log()
         if (req.token === null) {
             res.userType = 'guest'
             console.log(`Request called by ${res.userType}`)
             return next()
         } else {
-            Model.one(req.token.id).then(user => {
+            Model.oneSafe(req.token.id).then(user => {
                 res.userType = user.admin ? 'admin' : 'user'
                 console.log(`Request called by ${res.userType}`)
                 return next()

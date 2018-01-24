@@ -12,15 +12,15 @@ class User extends Model {
     }
 
     static index() {
-        return db('users').select('id', 'username', 'email', 'isAdmin', 'account_created_on', 'last_login')
+        return db('users').select('id', 'username', 'email', 'account_created_on', 'last_login')
     }
 
     static oneSafe(id) {
-        return db('users').select('id', 'username', 'isAdmin', 'account_created_on', 'last_login').where({ id }).first()
+        return db('users').select('id', 'username', 'account_created_on', 'last_login').where({ id }).first()
     }
 
     static oneAdmin(id) {
-        return db('users').select('id', 'username', 'email', 'isAdmin', 'account_created_on', 'last_login').where({ id }).first()
+        return db('users').select('id', 'username', 'email', 'account_created_on', 'last_login').where({ id }).first()
     }
 }
 
