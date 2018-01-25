@@ -12,7 +12,7 @@ const email = sendemail.email
 sendemail.set_template_directory(path.join(__dirname, '..', '..', 'templates'))
 
 const getImages = async (username) => {
-    console.log('getting instagram pics')
+    console.log('Getting instagram pictures...')
     const chromeless = new Chromeless()
 
     const photoLinks = await chromeless
@@ -45,12 +45,11 @@ const getImages = async (username) => {
     }
 
     if (!fs.existsSync(`./src/faceImages/${username}`)) fs.mkdirSync(`./src/faceImages/${username}`)
-    console.log('saving images')
+    console.log('Saving images...')
 
     const imagesPromise = photoLinks.map((el, i) => download(el, `./src/faceImages/${username}/image${i+1}.png`))
     const allPhotos = await Promise.all(imagesPromise)
 
-    console.log('done downloading')
     chromeless.end()
     processImages({ username, photoLinks, allPhotos })
 }
@@ -60,29 +59,26 @@ const processImages = async (info) =>{
     const photoLinks = info.photoLinks
     const allPhotos = info.allPhotos
     const faceLocationArray = []
-    console.log('processing images')
+    console.log('Processing images...')
 
     fr.winKillProcessOnExit()
 
     if (!fs.existsSync(`./src/faceImages/${username}/faces`)) fs.mkdirSync(`./src/faceImages/${username}/faces`)
 
     for (let p = 0; p < photoLinks.length; p++){
-        console.log(`processing image ${p+1}`)
         const image = fr.loadImage(`./src/faceImages/${username}/image${p+1}.png`)
 
         const startTime = Date.now()
-        console.log(`detecting faces from image ${p+1}`)
+        console.log(`Detecting faces from image ${p+1}...`)
         const targetSize = 150
         const faceImages = detector.detectFaces(image, targetSize)
-        console.log(`done detecting, ${faceImages.length} faces found in ${Math.round(((Date.now()-startTime)/100)/10)} seconds`)
-        console.log('setting image')
+        console.log(`Done detecting, ${faceImages.length} faces found in ${Math.round(((Date.now()-startTime)/100)/10)} seconds.`)
         for (let i = 0; i < faceImages.length; i++){
             fr.saveImage(`./src/faceImages/${username}/faces/face${p}_${i}.png`, faceImages[i])
             faceLocationArray.push(`./src/faceImages/${username}/faces/face${p}_${i}.png`)
         }
-        console.log(`image ${p+1} complete`)
     }
-    console.log(`face location and saving complete`)
+    console.log(`Face location and saving complete.`)
     //Model.storeFaces(allPhotos)
     // send email to user with quiz url
 
@@ -95,9 +91,7 @@ const processImages = async (info) =>{
     }
      
     email('quiz', person, function(error, result){
-      console.log(' - - - - - - - - - - - - - - - - - - - - -> email sent: ')
-      console.log(result);
-      console.log(' - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
+      console.log(`Email sent to ${username}`)
     })
 }
 
