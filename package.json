@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha",
     "knex": "knex",
-    "dev": "nodemon server.js"
+    "start": "google-chrome --remote-debugging-port=9222 --disable-gpu --headless & node server.js"
   },
   "repository": {
     "type": "git",

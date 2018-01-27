@@ -10,6 +10,11 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 
+app.get('/ping', (req, res, next) => {
+    console.log("Hi!  This route is working.")
+    res.send('hello')
+})
+
 const users = require('./src/routes/users')
 app.use('/api/users', users)
 

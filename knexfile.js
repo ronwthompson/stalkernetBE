@@ -26,7 +26,7 @@ module.exports = {
 
   production: {
     client: 'pg',
-    connection: process.env.DATABASE_URL,
+    connection: `postgres://iloverice:kelispell@stalkernet.c4dgh9rsuw0j.us-west-2.rds.amazonaws.com/stalkernet`,
     migrations: {
       directory: path.join(__dirname, 'src', 'db', 'migrations')
     },
