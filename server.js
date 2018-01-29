@@ -10,6 +10,8 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 
+app.use('/images', express.static(path.join(__dirname,'src','faceImages')))
+
 app.get('/ping', (req, res, next) => {
     console.log("Hi!  This route is working.")
     res.send('hello')
