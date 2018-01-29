@@ -1,10 +1,10 @@
+require('dotenv').load()
 const path = require('path')
 const fr = require('face-recognition')
 const { Chromeless } = require('chromeless')
 const fs = require('fs')
 const request = require('request')
 const Model = require(`../models/faces.model`)
-require('dotenv').load()
 const detector = fr.FaceDetector()
 const recognizer = fr.FaceRecognizer()
 const drawRects = (win, rects) => rects.forEach(rect => win.addOverlay(rect))
@@ -93,7 +93,7 @@ const processImages = async (info) =>{
     }
      
     email('quiz', person, function(error, result){
-      console.log(`Email sent to ${username}`)
+      console.log(`Email sent with quiz link!`)
     })
 }
 
