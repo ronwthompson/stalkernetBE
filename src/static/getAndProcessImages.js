@@ -83,11 +83,13 @@ const processImages = async (info) =>{
     //Model.storeFaces(allPhotos)
     // send email to user with quiz url
 
+    const quizID = btoa(JSON.stringify(faceLocationArray))
+
     const person = {
       name : "Stalker",
       email: "stalkernetdev@gmail.com",
       subject:"Testing StalkerNET",
-      quizUrl: `http://52.38.201.169/?quiz=${username}&faces=${JSON.stringify(faceLocationArray)}`
+      quizUrl: `http://52.38.201.169/?quiz=${username}&faces=${quizID}`
     }
      
     email('quiz', person, function(error, result){
