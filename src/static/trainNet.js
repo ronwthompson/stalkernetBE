@@ -12,7 +12,7 @@ const drawRects = (win, rects) => rects.forEach(rect => win.addOverlay(rect))
 const sendemail = require('sendemail')
 const email = sendemail.email
 sendemail.set_template_directory(path.join(__dirname, '..', '..', 'templates'))
-const ronaldModel = require('ronaldModel.json')
+const ronaldModel = require('./ronaldModel.json')
 
 const loadFaceImages = (body) => {
     const username = body.username
@@ -20,12 +20,12 @@ const loadFaceImages = (body) => {
     const accepted = body.accepted
     const onlyAcceptedFaces = []
 
-    fileLocations.length == accepted.length ? console.log('Error!') : console.log('Loading images...')
+    fileLocations.length !== accepted.length ? console.log('Error!') : console.log('Loading images...')
 
     accepted.forEach((e,i) => {
         if (e) {
             const file = fileLocations[i].split('/')
-            onlyAcceptedFaces.push(fr.loadImage(path.join(...file)))
+            onlyAcceptedFaces.push(fr.loadImage(path.join(__dirname, '..',file[file.length-4],file[file.length-3],file[file.length-2],file[file.length-1])))
         }
     })
 
@@ -39,9 +39,9 @@ const loadFaceImages = (body) => {
     google(username)
 }
 
-const google = (username) => { //&imgType=face
+const google = async (username) => { //&imgType=face
     const searchURL = `https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_API_KEY}&searchType=image&cx=${process.env.GOOGLE_API_ID}&q=${username}`
-    const results
+    let results = {}
     const oneThrough10 = rp(`${searchURL}&start=1`, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             return JSON.parse(body)
@@ -57,8 +57,8 @@ const google = (username) => { //&imgType=face
     //         return JSON.parse(body)
     //      }
     // })
-    Promise.all([oneThrough10]).then(searchResults => {
-        results = searchResults[0] //for some reason, cannot concat items arrays together
+    await Promise.all([oneThrough10]).then(searchResults => {
+        results = JSON.parse(searchResults[0]) //for some reason, cannot concat items arrays together
     })
 
     const save = function(uri, filename){
@@ -80,7 +80,7 @@ const google = (username) => { //&imgType=face
     const imagesPromise = results.items.map((el, i) => download(el.link, path.join(__dirname,`..`,`googleImages`,`${username}`,`image${i+1}.png`)))
     const allPhotos = await Promise.all(imagesPromise)
     console.log('Finished!')
-    
+
 }
 
 module.exports = {

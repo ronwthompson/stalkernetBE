@@ -83,7 +83,7 @@ const processImages = async (info) =>{
     //Model.storeFaces(allPhotos)
     // send email to user with quiz url
 
-    const quizID = btoa(JSON.stringify(faceLocationArray))
+    const quizID = new Buffer(faceLocationArray.toString()).toString('base64')
 
     const person = {
       name : "Stalker",
