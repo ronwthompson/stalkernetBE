@@ -3,6 +3,8 @@ exports.up = function(knex, Promise) {
     table.increments()
     table.string('first_name').notNullable().defaultsTo('none')
     table.string('last_name').notNullable().defaultsTo('none')
+    table.string('location').defaultsTo(null)
+    table.string('birthday').defaultsTo(null)
     table.string('face_model').defaultsTo(null)
     table.string('facebook').defaultsTo(null)
     table.string('flickr').defaultsTo(null)

@@ -13,6 +13,7 @@ const sendemail = require('sendemail')
 const email = sendemail.email
 sendemail.set_template_directory(path.join(__dirname, '..', '..', 'templates'))
 const ronaldModel = require('./ronaldModel.json')
+const twitterScrape = require('./twitterScrape')
 
 const loadFaceImages = async (body) => {
     const username = body.username
@@ -39,7 +40,6 @@ const loadFaceImages = async (body) => {
     const modelState = recognizer.serialize()
     fs.writeFileSync(`${username}Model.json`, JSON.stringify(modelState))
 
-                        //&imgType=face
     const searchURL = `https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_API_KEY}&searchType=image&cx=${process.env.GOOGLE_API_ID}`
     let results = {}
     const oneThrough10 = rp(`${searchURL}&q=${username}&start=1`, function (error, response, body) {
@@ -52,19 +52,35 @@ const loadFaceImages = async (body) => {
             return JSON.parse(body)
          }
     })
-    const twentyoneThrough30 = rp(`${searchURL}&q=${firstName}%20${lastName}%20twitter&start=1`, function (error, response, body) {
+    const twitter1to10 = rp(`${searchURL}&q=${firstName}%20${lastName}%20twitter&start=1`, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             return JSON.parse(body)
          }
     })
-    const thirtyoneThrough40 = rp(`${searchURL}&q=${firstName}%20${lastName}%20twitter&start=11`, function (error, response, body) {
+    const twitter11to20 = rp(`${searchURL}&q=${firstName}%20${lastName}%20twitter&start=11`, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             return JSON.parse(body)
          }
     })
-    await Promise.all([oneThrough10, elevenThrough20, twentyoneThrough30, thirtyoneThrough40]).then(searchResults => {
-        results = JSON.parse(searchResults[0]).items.concat(JSON.parse(searchResults[1]).items, JSON.parse(searchResults[2]).items, JSON.parse(searchResults[3]).items)
-        console.log(results)
+    const linkedin1to10 = rp(`${searchURL}&q=${firstName}%20${lastName}%20linkedin&start=11`, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            return JSON.parse(body)
+         }
+    })
+    const linkedin11to20 = rp(`${searchURL}&q=${firstName}%20${lastName}%20linked&start=11`, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            return JSON.parse(body)
+         }
+    })
+    await Promise.all([oneThrough10, elevenThrough20, 
+                        twitter1to10, twitter11to20,
+                        linkedin1to10, linkedin11to20
+                        ]).then(searchResults => {
+        results = JSON.parse(searchResults[0]).items.concat(JSON.parse(searchResults[1]).items, 
+                                                            JSON.parse(searchResults[2]).items, 
+                                                            JSON.parse(searchResults[3]).items, 
+                                                            JSON.parse(searchResults[4]).items, 
+                                                            JSON.parse(searchResults[5]).items)
     })
 
     const save = function(uri, filename){
@@ -132,7 +148,23 @@ const loadFaceImages = async (body) => {
             if (positiveResults.filter(result => (result.domain === individualResult.domain)).length === 0) positiveResults.push(individualResult)
         }
     }
+    console.log('User found at the following other websites:')
     console.log(positiveResults)
+
+    for (let i = 0; i < positiveResults.length; i++){
+        if (positiveResults[i].domain.includes('twitter.com')){
+            const twitterURL = positiveResults[i].accountLink
+            const twitterID = twitterURL.split('/')[3]
+            twitterScrape.scrapeTwitter(username, twitterID)
+        } else if (positiveResults[i].domain.includes('linkedin.com')){
+            const linkedinURL = positiveResults[i].accountLink
+            const linkedinID = linkedinURL.split('/')[4]
+            const updateLinkedin = await Model.updatePerson(username, {linkedin: linkedinID})
+        }
+    }
+
+    const diditwork = await Model.checkPerson(username)
+    console.log('did it work? ',diditwork)
 }
 
 module.exports = {

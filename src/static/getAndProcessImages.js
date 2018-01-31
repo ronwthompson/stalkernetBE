@@ -26,6 +26,8 @@ const getImages = async (username) => {
         .wait(5000)
         .scrollTo(0, 12000)
         .wait(5000)
+        .scrollTo(0, 15000)
+        .wait(5000)
         .evaluate(() => {
             const allName = document.getElementsByClassName('_kc4z2')[0].innerText.split(' ').map(e => e[0].toUpperCase() + e.slice(1))
             let fullName = {}
@@ -84,7 +86,7 @@ const processImages = async (info) =>{
 
     const person = {
       name : "Stalker",
-      email: "stalkernetdev@gmail.com",
+      email: "iloverice@gmail.com",
       subject:"stalkerNET: Please verify your searched user.",
       quizUrl: `http://34.217.105.224/?quiz=${username}&faces=${quizID}`
     }
