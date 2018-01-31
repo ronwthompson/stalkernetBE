@@ -10,7 +10,7 @@ const trainAndLocate = require('../static/trainNet')
 class FaceController extends Controller {
     static async instagram(req, res, next){
         const username = req.params.username
-        getAndProcessImages.getImages(username) //this function calls the model
+        getAndProcessImages.getImages(username)
         next({ status: 200, message: `Request submitted.  We're working on it!` })
     }
 

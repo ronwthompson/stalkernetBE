@@ -1,8 +1,6 @@
 Hello {{name}}!
 
-Your quiz is ready at {{quizUrl}}.
-
-Here is the array of face files: {{imageArray}}
+Your quiz is ready at: {{quizUrl}}
 
 Thanks!
 StalkerNET

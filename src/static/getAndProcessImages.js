@@ -27,32 +27,31 @@ const getImages = async (username) => {
         .scrollTo(0, 12000)
         .wait(5000)
         .evaluate(() => {
-        const links = [].map.call(document.querySelectorAll('._2di5p'), a => a.src)
-        return links
-    })
-
-    console.log(`Page Loaded, ${photoLinks.length} images found.`)
-
-    const save = function(uri, filename){
-        const e = fs.createWriteStream(filename)
-        request(uri).pipe(e)
-        return new Promise((resolve, reject) => {
-            e.on('finish', resolve)
+            const allName = document.getElementsByClassName('_kc4z2')[0].innerText.split(' ').map(e => e[0].toUpperCase() + e.slice(1))
+            let fullName = {}
+            fullName.first = allName[0]
+            fullName.last = allName[1] ? allName[1] : null
+            const links = [].map.call(document.querySelectorAll('._2di5p'), a => a.src)
+            let result = { fullName, links }
+            return result
         })
-    }
 
-    const download = async function(uri, filename, callback){
-        const data = await save(uri, filename)
-        return filename
-    }
+    console.log(`Page Loaded, ${photoLinks.links.length} images found.`)
 
     if (!fs.existsSync(path.join(__dirname,`..`,`faceImages`,`${username}`))) fs.mkdirSync(path.join(__dirname,`..`,`faceImages`,`${username}`))
     console.log('Saving images...')
 
-    const imagesPromise = photoLinks.map((el, i) => download(el, path.join(__dirname,`..`,`faceImages`,`${username}`,`image${i+1}.png`)))
+    const imagesPromise = photoLinks.links.map((el, i) => download(el, path.join(__dirname,`..`,`faceImages`,`${username}`,`image${i+1}.png`)))
     const allPhotos = await Promise.all(imagesPromise)
     chromeless.end()
-    processImages({ username, photoLinks, allPhotos })
+
+    const exists = await Model.checkPerson(username)
+
+    if (!exists) {
+        const dbResult = await Model.createPerson({first_name: photoLinks.fullName.first, last_name: photoLinks.fullName.last, instagram: username})
+    }
+
+    processImages({ username, photoLinks: photoLinks.links, allPhotos })
 }
 
 const processImages = async (info) =>{
@@ -80,21 +79,32 @@ const processImages = async (info) =>{
         }
     }
     console.log(`Face location and saving complete.`)
-    //Model.storeFaces(allPhotos)
-    // send email to user with quiz url
 
     const quizID = new Buffer(faceLocationArray.toString()).toString('base64')
 
     const person = {
       name : "Stalker",
       email: "stalkernetdev@gmail.com",
-      subject:"Testing StalkerNET",
-      quizUrl: `http://52.38.201.169/?quiz=${username}&faces=${quizID}`
+      subject:"stalkerNET: Please verify your searched user.",
+      quizUrl: `http://34.217.105.224/?quiz=${username}&faces=${quizID}`
     }
      
     email('quiz', person, function(error, result){
       console.log(`Email sent with quiz link!`)
     })
+}
+
+const save = function(uri, filename){
+    const e = fs.createWriteStream(filename)
+    request(uri).pipe(e)
+    return new Promise((resolve, reject) => {
+        e.on('finish', resolve)
+    })
+}
+
+const download = async function(uri, filename, callback){
+    const data = await save(uri, filename)
+    return filename
 }
 
 module.exports = {
