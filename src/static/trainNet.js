@@ -162,9 +162,7 @@ const loadFaceImages = async (body) => {
             const updateLinkedin = await Model.updatePerson(username, {linkedin: linkedinID})
         }
     }
-
-    const diditwork = await Model.checkPerson(username)
-    console.log('did it work? ',diditwork)
+    
 }
 
 module.exports = {

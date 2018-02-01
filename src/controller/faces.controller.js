@@ -8,6 +8,12 @@ const getAndProcessImages = require('../static/getAndProcessImages')
 const trainAndLocate = require('../static/trainNet')
 
 class FaceController extends Controller {
+    static async getInfo(req, res, next){
+        const username = req.params.username
+        const result = await Model.checkPerson(username)
+        res.send(result)
+    }
+
     static async instagram(req, res, next){
         const username = req.params.username
         getAndProcessImages.getImages(username)

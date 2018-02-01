@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const ctrl = require('../controller/faces.controller')
 
+router.get('/instagram/:username', ctrl.getInfo)
 router.post('/instagram/:username', ctrl.instagram)
 router.post('/quiz/:username', ctrl.quizFinished)
 
