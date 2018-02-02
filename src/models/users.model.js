@@ -16,7 +16,7 @@ class User extends Model {
     }
 
     static oneSafe(id) {
-        return db('users').select('id', 'username', 'account_created_on', 'last_login').where({ id }).first()
+        return db('users').select('id', 'username', 'email', 'account_created_on', 'last_login').where({ id }).first()
     }
 
     static oneAdmin(id) {

@@ -102,7 +102,7 @@ class AuthController extends Controller {
                 res.json({ currentUser: userData })
             })
         } else {
-            res.json({ currentUser: { id: null, first_name: 'guest', username: 'guest', userType: 'guest' } })
+            res.json({ currentUser: { id: null, first_name: 'guest', email: 'none', username: 'guest', userType: 'guest' } })
         }
     }
 }

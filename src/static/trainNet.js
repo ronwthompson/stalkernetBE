@@ -17,6 +17,7 @@ const twitterScrape = require('./twitterScrape')
 
 const loadFaceImages = async (body) => {
     const username = body.username
+    const emailAddress = body.email
     const exists = await Model.checkPerson(username)
     const firstName = exists.first_name
     const lastName = exists.last_name
@@ -135,8 +136,6 @@ const loadFaceImages = async (body) => {
             allResults.push({className: 'unknown', distance: 1})
         }
     }
-    // console.log(allResults)
-    // console.log(results.items)
 
     let positiveResults = []
 
@@ -160,9 +159,11 @@ const loadFaceImages = async (body) => {
             const linkedinURL = positiveResults[i].accountLink
             const linkedinID = linkedinURL.split('/')[4]
             const updateLinkedin = await Model.updatePerson(username, {linkedin: linkedinID})
+        } else {
+            const addOther = await Model.otherLink({username, other_link: positiveResults[i].accountLink})
         }
     }
-    
+
 }
 
 module.exports = {

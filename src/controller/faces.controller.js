@@ -14,9 +14,24 @@ class FaceController extends Controller {
         res.send(result)
     }
 
+    static async getAllInfo(req, res, next){
+        const username = req.params.username
+        const result = await Model.getAll(username)
+        res.send(result)
+    }
+
+    static async addOther(req, res, next){
+        const username = req.body.username
+        const otherLink = req.body.otherLink
+        const body = { username, other_link: otherLink }
+        const result = await Model.otherLink(body)
+        res.send(result)
+    }
+
     static async instagram(req, res, next){
         const username = req.params.username
-        getAndProcessImages.getImages(username)
+        const email = req.body.email
+        getAndProcessImages.getImages(username, email)
         next({ status: 200, message: `Request submitted.  We're working on it!` })
     }
 

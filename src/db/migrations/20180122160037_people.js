@@ -20,6 +20,7 @@ exports.up = function(knex, Promise) {
     table.string('tumblr').defaultsTo(null)
     table.string('twitter').defaultsTo(null)
     table.string('yelp').defaultsTo(null)
+    table.string('other').defaultsTo(null)
   })
 }
 

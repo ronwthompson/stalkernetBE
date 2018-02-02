@@ -12,7 +12,7 @@ const sendemail = require('sendemail')
 const email = sendemail.email
 sendemail.set_template_directory(path.join(__dirname, '..', '..', 'templates'))
 
-const getImages = async (username) => {
+const getImages = async (username, emailAddress) => {
     console.log('Getting instagram pictures...')
     const chromeless = new Chromeless()
     const photoLinks = await chromeless
@@ -53,13 +53,14 @@ const getImages = async (username) => {
         const dbResult = await Model.createPerson({first_name: photoLinks.fullName.first, last_name: photoLinks.fullName.last, instagram: username})
     }
 
-    processImages({ username, photoLinks: photoLinks.links, allPhotos })
+    processImages({ username, photoLinks: photoLinks.links, allPhotos, emailAddress })
 }
 
 const processImages = async (info) =>{
     const username = info.username
     const photoLinks = info.photoLinks
     const allPhotos = info.allPhotos
+    const emailAddress = info.emailAddress
     const faceLocationArray = []
     console.log('Processing images...')
 
@@ -86,7 +87,7 @@ const processImages = async (info) =>{
 
     const person = {
       name : "Stalker",
-      email: "iloverice@gmail.com",
+      email: emailAddress,
       subject:"stalkerNET: Please verify your searched user.",
       quizUrl: `http://34.217.105.224/?quiz=${username}&faces=${quizID}`
     }
