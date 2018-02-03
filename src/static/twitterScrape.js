@@ -9,12 +9,13 @@ const scrapeTwitter = async (username, twitterID) => {
         .goto(`https://www.twitter.com/${twitterID}`)
         .wait(5000)
         .evaluate(() => {
+            const profilePic = document.querySelectorAll('.ProfileAvatar-image')[0].src
             const location = document.querySelectorAll('.ProfileHeaderCard-locationText')[0].innerText
-            return location
+            return { location, profilePic }
         })
     console.log(`Page Loaded, location found.`, information)
     chromeless.end()
-    const updateTwitter = await Model.updatePerson(username, {twitter: twitterID, location: information})
+    const updateTwitter = await Model.updatePerson(username, {twitter: twitterID, twitter_image: information.profilePic, location: information.location})
     console.log('twitter update: ',updateTwitter)
 }
 

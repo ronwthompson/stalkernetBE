@@ -3,6 +3,7 @@ exports.up = function(knex, Promise) {
     table.increments()
     table.string('username').notNullable().defaultsTo('none')
     table.string('other_link').notNullable().defaultsTo('none')
+    table.string('other_image').notNullable().defaultsTo('none')
   })
 }
 

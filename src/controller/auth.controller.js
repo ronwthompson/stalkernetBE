@@ -96,7 +96,6 @@ class AuthController extends Controller {
     }
 
     static currentUser(req, res, next) {
-        console.log(req.token)
         if (req.token) {
             Model.oneSafe(req.token.id).then(userData => {
                 userData.userType = res.userType

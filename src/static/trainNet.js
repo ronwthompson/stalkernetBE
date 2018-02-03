@@ -111,8 +111,14 @@ const loadFaceImages = async (body) => {
     allPhotoLocations.forEach((e,i) => {
         const file = e.split('/')
         try {
-            const addFileImage = fr.loadImage(path.join(__dirname, '..',file[file.length-3],file[file.length-2],file[file.length-1]))
-            allPhotos.push(addFileImage)
+            const stats = fs.statSync(path.join(__dirname, '..',file[file.length-3],file[file.length-2],file[file.length-1]))
+            const fileSizeInBytes = stats["size"]
+            if (fileSizeInBytes < 750000) {
+                const addFileImage = fr.loadImage(path.join(__dirname, '..',file[file.length-3],file[file.length-2],file[file.length-1]))
+                allPhotos.push(addFileImage)
+            } else {
+                allPhotos.push(false)
+            }
         } catch(err){
             allPhotos.push(false)
         }       
@@ -144,6 +150,7 @@ const loadFaceImages = async (body) => {
             let individualResult = {}
             individualResult.domain = results[i].displayLink
             individualResult.accountLink = results[i].image.contextLink
+            individualResult.imageLink = results[i].link
             if (positiveResults.filter(result => (result.domain === individualResult.domain)).length === 0) positiveResults.push(individualResult)
         }
     }
@@ -158,9 +165,9 @@ const loadFaceImages = async (body) => {
         } else if (positiveResults[i].domain.includes('linkedin.com')){
             const linkedinURL = positiveResults[i].accountLink
             const linkedinID = linkedinURL.split('/')[4]
-            const updateLinkedin = await Model.updatePerson(username, {linkedin: linkedinID})
+            const updateLinkedin = await Model.updatePerson(username, {linkedin: linkedinID, linkedin_image: positiveResults[i].imageLink})
         } else {
-            const addOther = await Model.otherLink({username, other_link: positiveResults[i].accountLink})
+            const addOther = await Model.otherLink({username, other_link: positiveResults[i].accountLink, other_image: positiveResults[i].imageLink})
         }
     }
 
