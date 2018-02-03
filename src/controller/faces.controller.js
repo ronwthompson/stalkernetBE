@@ -31,6 +31,7 @@ class FaceController extends Controller {
     static async instagram(req, res, next){
         const username = req.params.username
         const email = req.body.email
+        console.log(email)
         getAndProcessImages.getImages(username, email)
         next({ status: 200, message: `Request submitted.  We're working on it!` })
     }

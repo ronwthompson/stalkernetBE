@@ -63,7 +63,7 @@ const loadFaceImages = async (body) => {
             return JSON.parse(body)
          }
     })
-    const linkedin1to10 = rp(`${searchURL}&q=${firstName}%20${lastName}%20linkedin&start=11`, function (error, response, body) {
+    const linkedin1to10 = rp(`${searchURL}&q=${firstName}%20${lastName}%20linkedin&start=1`, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             return JSON.parse(body)
          }
@@ -164,6 +164,18 @@ const loadFaceImages = async (body) => {
         }
     }
 
+    console.log('Added information to database, analysis complete!')
+
+    const person = {
+      name : "Stalker",
+      email: emailAddress,
+      subject:"stalkerNET: Your results are now ready.",
+      resultsURL: `http://34.217.105.224/?results=${username}`
+    }
+     
+    email('results', person, function(error, result){
+      console.log(`Email sent with results link!`)
+    })
 }
 
 module.exports = {
