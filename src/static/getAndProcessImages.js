@@ -30,11 +30,12 @@ const getImages = async (username, emailAddress) => {
         .wait(5000)
         .evaluate(() => {
             const allName = document.getElementsByClassName('_kc4z2')[0].innerText.split(' ').map(e => e[0].toUpperCase() + e.slice(1))
+            const profilePic = document.getElementsByClassName('_9bt3u')[0].src
             let fullName = {}
             fullName.first = allName[0]
             fullName.last = allName[1] ? allName[1] : null
             const links = [].map.call(document.querySelectorAll('._2di5p'), a => a.src)
-            let result = { fullName, links }
+            let result = { fullName, links, profilePic }
             return result
         })
 
@@ -50,7 +51,7 @@ const getImages = async (username, emailAddress) => {
     const exists = await Model.checkPerson(username)
 
     if (!exists) {
-        const dbResult = await Model.createPerson({first_name: photoLinks.fullName.first, last_name: photoLinks.fullName.last, instagram: username})
+        const dbResult = await Model.createPerson({first_name: photoLinks.fullName.first, last_name: photoLinks.fullName.last, instagram: username, instagram_image: photoLinks.profilePic})
     }
 
     processImages({ username, photoLinks: photoLinks.links, allPhotos, emailAddress })

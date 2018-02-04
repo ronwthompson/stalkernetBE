@@ -3,4 +3,4 @@ Hello {{name}}!
 Your quiz is ready at: {{quizUrl}}
 
 Thanks!
-StalkerNET
+stalkerNET

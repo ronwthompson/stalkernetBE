@@ -3,11 +3,22 @@ const Controller = require('./Controller')('users')
 const Model = require(`../models/faces.model`)
 const encryption = require('../encryption')
 const jwt = require('jsonwebtoken')
+const fs = require('fs')
+const path = require('path')
 
 const getAndProcessImages = require('../static/getAndProcessImages')
 const trainAndLocate = require('../static/trainNet')
 
 class FaceController extends Controller {
+    static async getFiles(req, res, next){
+        const username = req.params.username
+        const files = fs.readdirSync(path.join(__dirname, '..', 'faceImages', username, 'faces' ))
+        for (let i = 0; i < files.length; i++){
+            files[i] = path.join('faceImages', username, 'faces', files[i])
+        }
+        res.send(files)
+    }
+
     static async getInfo(req, res, next){
         const username = req.params.username
         const result = await Model.checkPerson(username)

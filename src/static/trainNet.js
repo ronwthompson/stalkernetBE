@@ -42,6 +42,7 @@ const loadFaceImages = async (body) => {
     fs.writeFileSync(`${username}Model.json`, JSON.stringify(modelState))
 
     const searchURL = `https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_API_KEY}&searchType=image&cx=${process.env.GOOGLE_API_ID}`
+    const searchURLsocial = `https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_API_KEY}&searchType=image&cx=${process.env.GOOGLE_API_ID_SOCIAL}`
     let results = {}
     const oneThrough10 = rp(`${searchURL}&q=${username}&start=1`, function (error, response, body) {
         if (!error && response.statusCode == 200) {
@@ -53,12 +54,22 @@ const loadFaceImages = async (body) => {
             return JSON.parse(body)
          }
     })
-    const twitter1to10 = rp(`${searchURL}&q=${firstName}%20${lastName}%20twitter&start=1`, function (error, response, body) {
+    const oneThrough10social = rp(`${searchURLsocial}&q=${username}&start=1`, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            return JSON.parse(body)
+         } 
+    })
+    const elevenThrough20social = rp(`${searchURLsocial}&q=${username}&start=11`, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             return JSON.parse(body)
          }
     })
-    const twitter11to20 = rp(`${searchURL}&q=${firstName}%20${lastName}%20twitter&start=11`, function (error, response, body) {
+    const twitter1to10 = rp(`${searchURLsocial}&q=${firstName}%20${lastName}%20twitter&start=1`, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            return JSON.parse(body)
+         }
+    })
+    const twitter11to20 = rp(`${searchURLsocial}&q=${firstName}%20${lastName}%20twitter&start=11`, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             return JSON.parse(body)
          }
@@ -74,6 +85,7 @@ const loadFaceImages = async (body) => {
          }
     })
     await Promise.all([oneThrough10, elevenThrough20, 
+                        oneThrough10social, elevenThrough20social, 
                         twitter1to10, twitter11to20,
                         linkedin1to10, linkedin11to20
                         ]).then(searchResults => {
@@ -81,7 +93,9 @@ const loadFaceImages = async (body) => {
                                                             JSON.parse(searchResults[2]).items, 
                                                             JSON.parse(searchResults[3]).items, 
                                                             JSON.parse(searchResults[4]).items, 
-                                                            JSON.parse(searchResults[5]).items)
+                                                            JSON.parse(searchResults[5]).items,
+                                                            JSON.parse(searchResults[6]).items, 
+                                                            JSON.parse(searchResults[7]).items)
     })
 
     const save = function(uri, filename){
