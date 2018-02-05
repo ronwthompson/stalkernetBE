@@ -75,12 +75,12 @@ const loadFaceImages = async (body) => {
             return JSON.parse(body)
          }
     })
-    const linkedin1to10 = rp(`${searchURL}&q=${firstName}%20${lastName}%20linkedin&start=1`, function (error, response, body) {
+    const linkedin1to10 = rp(`${searchURL}&q=%22${firstName}%20${lastName}%22%20linkedin&start=1`, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             return JSON.parse(body)
          }
     })
-    const linkedin11to20 = rp(`${searchURL}&q=${firstName}%20${lastName}%20linked&start=11`, function (error, response, body) {
+    const linkedin11to20 = rp(`${searchURL}&q=%22${firstName}%20${lastName}%22%20linked&start=11`, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             return JSON.parse(body)
          }
@@ -192,7 +192,7 @@ const loadFaceImages = async (body) => {
             twitterScrape.scrapeTwitter(username, twitterID)
         } if (positiveResults[i].domain.includes('gofundme.com')){
             const gofundmeURL = positiveResults[i].accountLink
-            gofundmeScrape.scrapeTwitter(username, gofundmeURL)
+            gofundmeScrape.scrapeGofundme(username, gofundmeURL)
         } else if (positiveResults[i].domain.includes('linkedin.com')){
             const linkedinURL = positiveResults[i].accountLink
             const linkedinID = linkedinURL.split('/')[4]
