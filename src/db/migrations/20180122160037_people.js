@@ -12,6 +12,8 @@ exports.up = function(knex, Promise) {
     table.string('flickr_image').defaultsTo(null)
     table.string('foursquare').defaultsTo(null)
     table.string('foursquare_image').defaultsTo(null)
+    table.string('gofundme').defaultsTo(null)
+    table.string('gofundme_image').defaultsTo(null)
     table.string('goodreads').defaultsTo(null)
     table.string('goodreads_image').defaultsTo(null)
     table.string('googleplus').defaultsTo(null)

@@ -14,6 +14,7 @@ const email = sendemail.email
 sendemail.set_template_directory(path.join(__dirname, '..', '..', 'templates'))
 const ronaldModel = require('./ronaldModel.json')
 const twitterScrape = require('./twitterScrape')
+const gofundmeScrape = require('./gofundmeScrape')
 
 const loadFaceImages = async (body) => {
     const username = body.username
@@ -84,10 +85,21 @@ const loadFaceImages = async (body) => {
             return JSON.parse(body)
          }
     })
+    const gofundme1to10 = rp(`${searchURL}&q=%22${firstName}%20${lastName}%22%20gofundme&start=1`, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            return JSON.parse(body)
+         }
+    })
+    const gofundme11to20 = rp(`${searchURL}&q=%22${firstName}%20${lastName}%22%20gofundme&start=11`, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            return JSON.parse(body)
+         }
+    })
     await Promise.all([oneThrough10, elevenThrough20, 
                         oneThrough10social, elevenThrough20social, 
                         twitter1to10, twitter11to20,
-                        linkedin1to10, linkedin11to20
+                        linkedin1to10, linkedin11to20,
+                        gofundme1to10, gofundme11to20
                         ]).then(searchResults => {
         results = JSON.parse(searchResults[0]).items.concat(JSON.parse(searchResults[1]).items, 
                                                             JSON.parse(searchResults[2]).items, 
@@ -95,7 +107,9 @@ const loadFaceImages = async (body) => {
                                                             JSON.parse(searchResults[4]).items, 
                                                             JSON.parse(searchResults[5]).items,
                                                             JSON.parse(searchResults[6]).items, 
-                                                            JSON.parse(searchResults[7]).items)
+                                                            JSON.parse(searchResults[7]).items,
+                                                            JSON.parse(searchResults[8]).items, 
+                                                            JSON.parse(searchResults[9]).items)
     })
 
     const save = function(uri, filename){
@@ -176,6 +190,9 @@ const loadFaceImages = async (body) => {
             const twitterURL = positiveResults[i].accountLink
             const twitterID = twitterURL.split('/')[3]
             twitterScrape.scrapeTwitter(username, twitterID)
+        } if (positiveResults[i].domain.includes('gofundme.com')){
+            const gofundmeURL = positiveResults[i].accountLink
+            gofundmeScrape.scrapeTwitter(username, gofundmeURL)
         } else if (positiveResults[i].domain.includes('linkedin.com')){
             const linkedinURL = positiveResults[i].accountLink
             const linkedinID = linkedinURL.split('/')[4]
