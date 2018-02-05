@@ -84,13 +84,11 @@ const processImages = async (info) =>{
     }
     console.log(`Face location and saving complete.`)
 
-    const quizID = new Buffer(faceLocationArray.toString()).toString('base64')
-
     const person = {
       name : "Stalker",
       email: emailAddress,
       subject:"stalkerNET: Please verify your searched user.",
-      quizUrl: `http://34.217.105.224/?quiz=${username}&faces=${quizID}`
+      quizUrl: `http://34.217.105.224/?quiz=${username}`
     }
      
     email('quiz', person, function(error, result){
